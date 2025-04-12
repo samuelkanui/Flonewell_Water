@@ -58,6 +58,12 @@
                     Usage History
                 </a>
 
+                <!-- Customer Payments Link -->
+                <a href="{{ route('admin.customer_payments') }}" 
+                   class="block px-4 py-2 text-white hover:bg-gray-700 {{ Route::is('admin.customer_payments') ? 'bg-gray-700' : '' }} sidebar-link">
+                    Customer Payments
+                </a>
+
                 <!-- Messages Link -->
                 <a href="{{ route('messages.index') }}" 
                    class="block px-4 py-2 text-white hover:bg-gray-700 {{ Route::is('messages.*') ? 'bg-gray-700' : '' }} sidebar-link">

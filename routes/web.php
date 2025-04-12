@@ -46,6 +46,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/meter-readings', [AdminController::class, 'meterReadings'])->name('admin.meter_readings');
     Route::put('/meter-readings/{reading}', [AdminController::class, 'updateMeterReading'])->name('admin.update_meter_reading');
     Route::get('/usage-history', [AdminController::class, 'usageHistory'])->name('admin.usage_history');
+    Route::get('/customer-payments', [AdminController::class, 'customerPayments'])->name('admin.customer_payments');
 
     // Customer Profile Management
     Route::get('/customers/{user}/profile', [AdminController::class, 'viewCustomerProfile'])->name('admin.customers.profile');
@@ -58,6 +59,7 @@ Route::prefix('admin')->middleware(['auth', 'role:admin'])->group(function () {
 Route::middleware(['auth', 'role:customer'])->group(function () {
     Route::get('/dashboard', [CustomerController::class, 'dashboard'])->name('dashboard');
     Route::post('/pay', [CustomerController::class, 'pay'])->name('customer.pay');
+    Route::get('/payment-status', [CustomerController::class, 'paymentStatus'])->name('customer.payment_status');
 });
 
 // Agent Routes

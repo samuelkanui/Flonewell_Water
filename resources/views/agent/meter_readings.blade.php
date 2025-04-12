@@ -105,10 +105,7 @@
             </div>
         </div>
     </div>
-    
 </div>
-
-
 @endsection
 
 @section('scripts')
@@ -142,6 +139,12 @@ $(document).ready(function() {
         const customerId = $('#customer_select').val();
         const customerName = $('#customer_select option:selected').text();
         
+        console.log('New Reading Button Clicked:', {
+            customerId,
+            customerName,
+            selectElement: $('#customer_select').html()
+        });
+        
         if (!customerId) {
             alert('Please select a customer first');
             return;
@@ -151,9 +154,16 @@ $(document).ready(function() {
         $.get(`/agent/customers/${customerId}/readings`, function(data) {
             let previousReading = 0;
             if (data && data.length > 0) {
-                previousReading = data[0].current_reading; // Get the most recent reading
+                previousReading = data[0].current_reading;
             }
             
+            console.log('Setting modal values:', {
+                customerId,
+                customerName,
+                previousReading
+            });
+            
+            // Set the values in the modal
             $('#modal_customer_id').val(customerId);
             $('#customer-name').text(customerName);
             $('#prev-reading').text(previousReading);
@@ -161,6 +171,13 @@ $(document).ready(function() {
             $('#msg').html('');
             $('#current_reading').val('');
             $('#units-used').text('-');
+            
+            // Verify the values were set correctly
+            console.log('Modal values after setting:', {
+                modalCustomerId: $('#modal_customer_id').val(),
+                modalCustomerName: $('#customer-name').text(),
+                modalPreviousReading: $('#modal_previous_reading').val()
+            });
             
             $('#submitReadingModal').modal('show');
         });
@@ -207,13 +224,28 @@ $(document).ready(function() {
         const form = $(this);
         const submitButton = $('#submit-button');
         
-        // Validate form data
+        // Get the customer ID directly from the hidden field
         const customerId = $('#modal_customer_id').val();
         const previousReading = parseFloat($('#modal_previous_reading').val());
         const currentReading = parseFloat($('#current_reading').val());
 
+        console.log('Form submission values:', {
+            customerId,
+            previousReading,
+            currentReading,
+            formData: form.serialize(),
+            modalCustomerId: $('#modal_customer_id').val(),
+            modalPreviousReading: $('#modal_previous_reading').val(),
+            currentReadingInput: $('#current_reading').val()
+        });
+
         if (!customerId) {
-            $('#msg').html('<div class="text-red-400">Customer ID is required</div>');
+            console.log('Customer ID validation failed:', {
+                customerId,
+                modalCustomerId: $('#modal_customer_id').val(),
+                selectValue: $('#customer_select').val()
+            });
+            $('#msg').html('<div class="text-red-400">Please select a customer first</div>');
             return;
         }
 
@@ -238,6 +270,7 @@ $(document).ready(function() {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
             success: function(response) {
+                console.log('Submission successful:', response);
                 $('#msg').html('<div class="text-green-400">' + response.message + '</div>');
                 setTimeout(() => {
                     $('#submitReadingModal').modal('hide');
@@ -245,9 +278,19 @@ $(document).ready(function() {
                 }, 1000);
             },
             error: function(xhr) {
-                let errorMessage = xhr.responseJSON && xhr.responseJSON.message ? xhr.responseJSON.message : 'An error occurred';
-                if (xhr.responseJSON && xhr.responseJSON.errors) {
-                    errorMessage += '<ul>' + Object.values(xhr.responseJSON.errors).map(err => '<li>' + err + '</li>').join('') + '</ul>';
+                console.log('Submission error:', xhr);
+                let errorMessage = 'An error occurred while submitting the reading';
+                if (xhr.responseJSON) {
+                    if (xhr.responseJSON.message) {
+                        errorMessage = xhr.responseJSON.message;
+                    }
+                    if (xhr.responseJSON.errors) {
+                        errorMessage += '<ul class="mt-2">' + 
+                            Object.values(xhr.responseJSON.errors)
+                                .map(err => '<li>• ' + err + '</li>')
+                                .join('') + 
+                            '</ul>';
+                    }
                 }
                 $('#msg').html('<div class="text-red-400">' + errorMessage + '</div>');
                 submitButton.prop('disabled', false).text('Submit');

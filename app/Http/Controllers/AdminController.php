@@ -33,9 +33,10 @@ class AdminController extends Controller
             'phone' => 'required|regex:/^254[0-9]{9}$/|unique:users',
             'password' => 'required|string|min:8|confirmed',
             'agent_id' => 'nullable|exists:users,id',
+            'initial_reading' => 'nullable|numeric|min:0',
         ]);
 
-        User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
@@ -45,6 +46,18 @@ class AdminController extends Controller
             'balance' => 0,
             'agent_id' => $request->agent_id,
         ]);
+
+        // Create initial meter reading if provided
+        if ($request->filled('initial_reading')) {
+            MeterReading::create([
+                'customer_id' => $user->id,
+                'agent_id' => $request->agent_id,
+                'previous_reading' => 0,
+                'current_reading' => $request->initial_reading,
+                'units' => $request->initial_reading,
+                'status' => 'approved',
+            ]);
+        }
 
         return redirect()->route('admin.dashboard')->with('success', 'Customer created successfully.');
     }
@@ -292,5 +305,21 @@ class AdminController extends Controller
             });
 
         return view('admin.usage_history', compact('readings'));
+    }
+
+    public function customerPayments()
+    {
+        $customers = User::where('role', 'customer')
+            ->with(['payments' => function($query) {
+                $query->orderBy('created_at', 'desc');
+            }])
+            ->get()
+            ->map(function($customer) {
+                $customer->last_payment = $customer->payments->first();
+                $customer->payment_status = $customer->last_payment ? $customer->last_payment->status : 'no_payment';
+                return $customer;
+            });
+
+        return view('admin.customer_payments', compact('customers'));
     }
 }

@@ -40,6 +40,12 @@
                     Dashboard
                 </a>
 
+                <!-- Payment Status Link -->
+                <a href="{{ route('customer.payment_status') }}" 
+                   class="block px-4 py-2 text-white hover:bg-gray-700 {{ Route::is('customer.payment_status') ? 'bg-gray-700' : '' }} sidebar-link">
+                    Payment Status
+                </a>
+
                 <!-- Messages Link -->
                 <a href="{{ route('messages.index') }}" 
                    class="block px-4 py-2 text-white hover:bg-gray-700 {{ Route::is('messages.*') ? 'bg-gray-700' : '' }} sidebar-link">

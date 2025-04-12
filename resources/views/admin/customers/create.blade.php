@@ -88,6 +88,20 @@
                                placeholder="Confirm password" 
                                required>
                     </div>
+
+                    <!-- Initial Meter Reading Field -->
+                    <div>
+                        <label for="initial_reading" class="block text-sm font-medium text-gray-300 mb-1">Initial Meter Reading (Optional)</label>
+                        <input type="number" name="initial_reading" id="initial_reading" 
+                               class="mt-1 block w-full bg-gray-700 border-gray-600 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 text-white @error('initial_reading') border-red-500 @enderror" 
+                               value="{{ old('initial_reading', 0) }}" 
+                               placeholder="Enter initial meter reading" 
+                               min="0" step="0.01">
+                        @error('initial_reading')
+                            <p class="mt-1 text-sm text-red-400">{{ $message }}</p>
+                        @enderror
+                        <p class="mt-1 text-sm text-gray-400">Leave as 0 for new meters, or enter the current reading for existing meters</p>
+                    </div>
                 </div>
 
                 <!-- Submit Button -->

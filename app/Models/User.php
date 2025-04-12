@@ -12,15 +12,18 @@ class User extends Authenticatable
 
     protected $fillable = [
         'name', 'email', 'phone', 'password', 'role', 'water_units', 'balance', 'agent_id',
+        'two_factor_enabled', 'two_factor_secret', 'two_factor_recovery_codes'
     ];
 
     protected $hidden = [
-        'password', 'remember_token',
+        'password', 'remember_token', 'two_factor_secret', 'two_factor_recovery_codes'
     ];
 
     protected $casts = [
         'water_units' => 'float',
         'balance' => 'float',
+        'two_factor_enabled' => 'boolean',
+        'two_factor_recovery_codes' => 'array'
     ];
 
     public function isAdmin()
